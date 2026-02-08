@@ -874,13 +874,19 @@
             </div>
 
             <div class="insight-section">
-                <div class="insight-title">Finger-Note Distribution Analysis</div>
-                <div class="chart-container" style="height: 500px; margin-bottom: 2rem;">
-                    <canvas id="fingerNoteChart"></canvas>
+                <div class="insight-title">Finger-Note Distribution: Ascending</div>
+                <div class="chart-container" style="height: 400px; margin-bottom: 2rem;">
+                    <canvas id="fingerNoteChartAsc"></canvas>
                 </div>
-                <div id="aggregate-stats-container">
-                    <!-- Table will be injected here -->
+                <div id="aggregate-stats-asc"></div>
+            </div>
+
+            <div class="insight-section">
+                <div class="insight-title">Finger-Note Distribution: Descending</div>
+                <div class="chart-container" style="height: 400px; margin-bottom: 2rem;">
+                    <canvas id="fingerNoteChartDesc"></canvas>
                 </div>
+                <div id="aggregate-stats-desc"></div>
             </div>
 
             <table id="note-table">
@@ -909,7 +915,8 @@
 
         let velocityChart = null;
         let offsetChart = null;
-        let fingerNoteChart = null;
+        let fingerNoteChartAsc = null;
+        let fingerNoteChartDesc = null;
         let currentMidi = null;
         let selectedHand = 'RH';
 
@@ -1115,7 +1122,8 @@
 
             if (velocityChart) velocityChart.destroy();
             if (offsetChart) offsetChart.destroy();
-            if (fingerNoteChart) fingerNoteChart.destroy();
+            if (fingerNoteChartAsc) fingerNoteChartAsc.destroy();
+            if (fingerNoteChartDesc) fingerNoteChartDesc.destroy();
 
             const ctxVel = document.getElementById('velocityChart').getContext('2d');
             velocityChart = new Chart(ctxVel, {
@@ -1183,15 +1191,31 @@
                 }
             });
 
-            // Finger-Note Aggregation
-            const aggregates = aggregateAnalysis(notes);
+            // Finger-Note Analysis for Ascending
+            const ascendingNotes = notes.filter(n => n.direction === 'ascending');
+            fingerNoteChartAsc = renderFingerNoteSection('fingerNoteChartAsc', 'aggregate-stats-asc', ascendingNotes);
+
+            // Finger-Note Analysis for Descending
+            const descendingNotes = notes.filter(n => n.direction === 'descending');
+            fingerNoteChartDesc = renderFingerNoteSection('fingerNoteChartDesc', 'aggregate-stats-desc', descendingNotes);
+        }
+
+        function renderFingerNoteSection(canvasId, tableContainerId, sectionNotes) {
+            if (sectionNotes.length === 0) {
+                document.getElementById(tableContainerId).innerHTML = '<p class="empty-section-message">No data for this direction</p>';
+                document.getElementById(canvasId).style.display = 'none';
+                return null;
+            }
+            document.getElementById(canvasId).style.display = 'block';
+
+            const aggregates = aggregateAnalysis(sectionNotes);
             const fingerLabels = aggregates.map(a => `${a.note} (F${a.finger})`);
             const fingerPosOffsets = aggregates.map(a => a.avgPosOffset);
             const fingerNegOffsets = aggregates.map(a => a.avgNegOffset);
             const fingerVels = aggregates.map(a => a.avgVelocity);
 
-            const ctxFinger = document.getElementById('fingerNoteChart').getContext('2d');
-            fingerNoteChart = new Chart(ctxFinger, {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const chart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: fingerLabels,
@@ -1250,7 +1274,8 @@
                 }
             });
 
-            updateAggregateTable(aggregates);
+            updateAggregateTable(tableContainerId, aggregates);
+            return chart;
         }
 
         function aggregateAnalysis(notes) {
@@ -1284,8 +1309,9 @@
             }).sort((a, b) => a.midi - b.midi || a.finger - b.finger);
         }
 
-        function updateAggregateTable(aggregates) {
-            const container = document.getElementById('aggregate-stats-container');
+        function updateAggregateTable(containerId, aggregates) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             let html = `
                 <table style="margin-top: 1rem;">
                     <thead>
