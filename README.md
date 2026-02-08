@@ -1,6 +1,8 @@
-# MIDI Piano Practice Analyzer
+# MIDI Piano Technical Exercise Analyzer
 
-A premium web-based tool designed to analyze piano scale recordings and provide deep technical insights into timing, velocity, and fingering technique.
+A specialized tool for analyzing rhythmic and dynamic evenness in piano scales and technical studies. It is specifically designed to evaluate MIDI recordings of single-note patterns (such as quarter-note scales) played against a steady beat.
+
+Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency of technical execution, helping pianists identify finger-specific weaknesses and directional biases.
 
 ## 🎹 Key Features
 
@@ -28,7 +30,7 @@ A premium web-based tool designed to analyze piano scale recordings and provide 
 
 ## 🚀 How to Use
 
-1. **Record your MIDI**: Record a scale (recommended: quarter notes) in any MIDI sequencer.
+1. **Record your MIDI**: Record a technical exercise (like a C Major scale) against a steady metronome. The tool is optimized for **quarter-note** recordings.
 2. **Select Hand**: Toggle between **Left Hand (LH)** and **Right Hand (RH)** in the tool.
 3. **Upload**: Drag and drop your `.mid` file into the analyzer.
 4. **Analyze**: Explore the dashboard, charts, and tables to identify technical areas for improvement.
