@@ -82,31 +82,48 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
             margin-bottom: 2rem;
         }
 
         .stat-card {
             background-color: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            text-align: center;
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent);
-            margin: 0.5rem 0;
+            margin: 0;
+            line-height: 1;
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.875rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            line-height: 1;
+        }
+
+        .stat-sublabel {
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            opacity: 0.6;
         }
 
         .charts-grid {
@@ -763,29 +780,46 @@
         <div id="results" style="display: none;">
             <div class="dashboard">
                 <div class="stat-card">
-                    <div class="stat-label">Avg. Velocity</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Avg. Velocity</div>
+                        <div class="stat-sublabel" id="velocity-jitter">Range: -</div>
+                    </div>
                     <div class="stat-value" id="avg-velocity">-</div>
-                    <div class="stat-label" id="velocity-jitter">Jitter: -</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Avg. Offset</div>
-                    <div class="stat-value" id="avg-offset">-</div>
-                    <div class="stat-label">ms from grid</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Behind Beat</div>
+                        <div class="stat-sublabel">Avg. Late (ms)</div>
+                    </div>
+                    <div class="stat-value" id="behind-offset" style="color: #22c55e;">-</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Timing Consistency</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Ahead Beat</div>
+                        <div class="stat-sublabel">Avg. Early (ms)</div>
+                    </div>
+                    <div class="stat-value" id="ahead-offset" style="color: #38bdf8;">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-label">Timing Consistency</div>
+                        <div class="stat-sublabel">Std. Deviation</div>
+                    </div>
                     <div class="stat-value" id="timing-consistency">-</div>
-                    <div class="stat-label">Std. Deviation</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Note Count</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Note Count</div>
+                        <div class="stat-sublabel">Quarter Notes</div>
+                    </div>
                     <div class="stat-value" id="note-count">-</div>
-                    <div class="stat-label">Quarter Notes</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Deviation Rate</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Deviation Rate</div>
+                        <div class="stat-sublabel" id="deviation-count">0 Deviations</div>
+                    </div>
                     <div class="stat-value" id="deviation-rate">-</div>
-                    <div class="stat-label" id="deviation-count">0 Deviations</div>
                 </div>
             </div>
 
@@ -1139,16 +1173,23 @@
 
         function updateStats(notes) {
             const velocities = notes.map(n => n.velocity);
-            const offsets = notes.map(n => Math.abs(n.offsetMs));
+            const offsets = notes.map(n => n.offsetMs);
+            const absOffsets = offsets.map(n => Math.abs(n));
 
             const avgVel = velocities.reduce((a, b) => a + b, 0) / notes.length;
-            const avgOffset = offsets.reduce((a, b) => a + b, 0) / notes.length;
+            const avgOffset = absOffsets.reduce((a, b) => a + b, 0) / notes.length;
+
+            const posOffsets = offsets.filter(o => o > 0);
+            const negOffsets = offsets.filter(o => o < 0);
+
+            const avgBehind = posOffsets.length > 0 ? posOffsets.reduce((a, b) => a + b, 0) / posOffsets.length : 0;
+            const avgAhead = negOffsets.length > 0 ? Math.abs(negOffsets.reduce((a, b) => a + b, 0) / negOffsets.length) : 0;
 
             const maxVel = Math.max(...velocities);
             const minVel = Math.min(...velocities);
             const jitter = maxVel - minVel;
 
-            const squareDiffs = offsets.map(o => Math.pow(o - avgOffset, 2));
+            const squareDiffs = absOffsets.map(o => Math.pow(o - avgOffset, 2));
             const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / notes.length;
             const stdDev = Math.sqrt(avgSquareDiff);
 
@@ -1157,7 +1198,8 @@
 
             document.getElementById('avg-velocity').textContent = avgVel.toFixed(1);
             document.getElementById('velocity-jitter').textContent = `Range: ${jitter} (Min: ${minVel}, Max: ${maxVel})`;
-            document.getElementById('avg-offset').textContent = avgOffset.toFixed(1);
+            document.getElementById('behind-offset').textContent = avgBehind.toFixed(1) + 'ms';
+            document.getElementById('ahead-offset').textContent = avgAhead.toFixed(1) + 'ms';
             document.getElementById('timing-consistency').textContent = stdDev.toFixed(1);
             document.getElementById('note-count').textContent = notes.length;
             document.getElementById('deviation-rate').textContent = deviationRate.toFixed(1) + '%';
