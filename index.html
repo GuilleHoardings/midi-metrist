@@ -1032,16 +1032,25 @@
                 const isAsc = seg.direction === 'ascending';
                 const patternKey = selectedHand + '_' + (isAsc ? 'asc' : 'desc');
                 const pattern = fingeringPatterns[patternKey];
-
-                // Track previous finger for crossing detection
                 let prevFinger = null;
 
                 seg.notes.forEach((note, i) => {
                     const pitchName = note.pitchName;
                     const degree = noteToDegree[pitchName];
+                    const isLast = i === seg.notes.length - 1;
+                    const isFirst = i === 0;
 
                     if (degree !== undefined && pattern[degree] !== undefined) {
                         note.fingering = pattern[degree];
+
+                        // Special case for segment boundaries (e.g., ending on finger 5 instead of 1)
+                        if (selectedHand === 'RH') {
+                            if (isAsc && isLast && degree === 0) note.fingering = 5;
+                            if (!isAsc && isFirst && degree === 0) note.fingering = 5;
+                        } else { // LH
+                            if (isAsc && isFirst && degree === 0) note.fingering = 5;
+                            if (!isAsc && isLast && degree === 0) note.fingering = 5;
+                        }
 
                         // Detect crossings (thumb-under or finger-over)
                         if (prevFinger !== null) {
