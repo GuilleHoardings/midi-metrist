@@ -82,48 +82,95 @@
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.75rem;
             margin-bottom: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
         }
 
         .stat-card {
             background-color: var(--card-bg);
-            padding: 1rem 1.25rem;
-            border-radius: 0.75rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .stat-info {
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
             display: flex;
             flex-direction: column;
-            gap: 0.25rem;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 70px;
+            position: relative;
+            cursor: help;
+        }
+
+        /* Tooltip Styles */
+        .stat-card::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: #1e293b;
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            width: 180px;
+            line-height: 1.4;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            border: 6px solid transparent;
+            border-top-color: #334155;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .stat-card:hover::before,
+        .stat-card:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--accent);
             margin: 0;
-            line-height: 1;
+            line-height: 1.2;
         }
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             line-height: 1;
-        }
-
-        .stat-sublabel {
-            color: var(--text-secondary);
-            font-size: 0.65rem;
-            opacity: 0.6;
+            margin-top: 0.25rem;
         }
 
         .charts-grid {
@@ -779,47 +826,34 @@
 
         <div id="results" style="display: none;">
             <div class="dashboard">
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <div class="stat-label">Avg. Velocity</div>
-                        <div class="stat-sublabel" id="velocity-jitter">Range: -</div>
-                    </div>
-                    <div class="stat-value" id="avg-velocity">-</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <div class="stat-label">Behind Beat</div>
-                        <div class="stat-sublabel">Avg. Late (ms)</div>
-                    </div>
-                    <div class="stat-value" id="behind-offset" style="color: #22c55e;">-</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <div class="stat-label">Ahead Beat</div>
-                        <div class="stat-sublabel">Avg. Early (ms)</div>
-                    </div>
-                    <div class="stat-value" id="ahead-offset" style="color: #38bdf8;">-</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <div class="stat-label">Timing Consistency</div>
-                        <div class="stat-sublabel">Std. Deviation</div>
-                    </div>
-                    <div class="stat-value" id="timing-consistency">-</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <div class="stat-label">Note Count</div>
-                        <div class="stat-sublabel">Quarter Notes</div>
-                    </div>
+                <div class="stat-card" data-tooltip="Total number of notes analyzed in the recording.">
                     <div class="stat-value" id="note-count">-</div>
+                    <div class="stat-label">Notes</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-info">
-                        <div class="stat-label">Deviation Rate</div>
-                        <div class="stat-sublabel" id="deviation-count">0 Deviations</div>
-                    </div>
-                    <div class="stat-value" id="deviation-rate">-</div>
+                <div class="stat-card"
+                    data-tooltip="Average absolute timing error. Measures overall precision regardless of being early or late.">
+                    <div class="stat-value" id="avg-offset">-</div>
+                    <div class="stat-label">Avg Offset</div>
+                </div>
+                <div class="stat-card"
+                    data-tooltip="Percentage of notes played significantly behind the beat (>30ms late).">
+                    <div class="stat-value" id="late-pct" style="color: #22c55e;">-</div>
+                    <div class="stat-label">Late</div>
+                </div>
+                <div class="stat-card"
+                    data-tooltip="Percentage of notes played significantly ahead of the beat (>30ms early).">
+                    <div class="stat-value" id="early-pct" style="color: #38bdf8;">-</div>
+                    <div class="stat-label">Early</div>
+                </div>
+                <div class="stat-card"
+                    data-tooltip="The range between your loudest and softest notes. Lower values indicate a more even and controlled touch.">
+                    <div class="stat-value" id="vel-spread">-</div>
+                    <div class="stat-label">Vel Spread</div>
+                </div>
+                <div class="stat-card"
+                    data-tooltip="Overall percentage of notes played with professional-grade timing and velocity consistency.">
+                    <div class="stat-value" id="accuracy">-</div>
+                    <div class="stat-label">Accuracy</div>
                 </div>
             </div>
 
@@ -1172,38 +1206,67 @@
         }
 
         function updateStats(notes) {
-            const velocities = notes.map(n => n.velocity);
             const offsets = notes.map(n => n.offsetMs);
-            const absOffsets = offsets.map(n => Math.abs(n));
+            const velocities = notes.map(n => n.velocity);
 
-            const avgVel = velocities.reduce((a, b) => a + b, 0) / notes.length;
-            const avgOffset = absOffsets.reduce((a, b) => a + b, 0) / notes.length;
+            // Avg Offset: based on absolute offsets
+            const absOffsets = offsets.map(Math.abs);
+            const avgAbsOffset = absOffsets.reduce((a, b) => a + b, 0) / notes.length;
 
-            const posOffsets = offsets.filter(o => o > 0);
-            const negOffsets = offsets.filter(o => o < 0);
+            // Late/Early percentages: notes with significant timing deviation (>30ms)
+            const THRESHOLD = 30;
+            const lateNotes = notes.filter(n => n.offsetMs > THRESHOLD);
+            const earlyNotes = notes.filter(n => n.offsetMs < -THRESHOLD);
+            const latePct = (lateNotes.length / notes.length) * 100;
+            const earlyPct = (earlyNotes.length / notes.length) * 100;
 
-            const avgBehind = posOffsets.length > 0 ? posOffsets.reduce((a, b) => a + b, 0) / posOffsets.length : 0;
-            const avgAhead = negOffsets.length > 0 ? Math.abs(negOffsets.reduce((a, b) => a + b, 0) / negOffsets.length) : 0;
-
+            // Velocity Spread: range (max - min)
             const maxVel = Math.max(...velocities);
             const minVel = Math.min(...velocities);
-            const jitter = maxVel - minVel;
+            const velRange = maxVel - minVel;
 
-            const squareDiffs = absOffsets.map(o => Math.pow(o - avgOffset, 2));
-            const avgSquareDiff = squareDiffs.reduce((a, b) => a + b, 0) / notes.length;
-            const stdDev = Math.sqrt(avgSquareDiff);
-
+            // Accuracy: percentage of notes without deviations
             const deviationCount = notes.filter(n => n.isDeviation).length;
-            const deviationRate = (deviationCount / notes.length) * 100;
+            const accuracy = ((notes.length - deviationCount) / notes.length) * 100;
 
-            document.getElementById('avg-velocity').textContent = avgVel.toFixed(1);
-            document.getElementById('velocity-jitter').textContent = `Range: ${jitter} (Min: ${minVel}, Max: ${maxVel})`;
-            document.getElementById('behind-offset').textContent = avgBehind.toFixed(1) + 'ms';
-            document.getElementById('ahead-offset').textContent = avgAhead.toFixed(1) + 'ms';
-            document.getElementById('timing-consistency').textContent = stdDev.toFixed(1);
+            // Update DOM
             document.getElementById('note-count').textContent = notes.length;
-            document.getElementById('deviation-rate').textContent = deviationRate.toFixed(1) + '%';
-            document.getElementById('deviation-count').textContent = `${deviationCount} Deviations`;
+
+            // Avg Offset: average absolute offset (lower is better)
+            const avgOffsetEl = document.getElementById('avg-offset');
+            avgOffsetEl.textContent = avgAbsOffset.toFixed(1) + 'ms';
+            if (avgAbsOffset <= 15) {
+                avgOffsetEl.style.color = '#22c55e'; // green - excellent
+            } else if (avgAbsOffset <= 30) {
+                avgOffsetEl.style.color = '#fbbf24'; // yellow - acceptable
+            } else {
+                avgOffsetEl.style.color = '#ef4444'; // red - needs work
+            }
+
+            // Late/Early percentages
+            document.getElementById('late-pct').textContent = latePct.toFixed(0) + '%';
+            document.getElementById('early-pct').textContent = earlyPct.toFixed(0) + '%';
+
+            // Velocity Spread
+            const velSpreadEl = document.getElementById('vel-spread');
+            velSpreadEl.textContent = velRange;
+            if (velRange <= 15) {
+                velSpreadEl.style.color = '#22c55e'; // green - very even
+            } else if (velRange <= 30) {
+                velSpreadEl.style.color = '#fbbf24'; // yellow - acceptable
+            } else {
+                velSpreadEl.style.color = '#ef4444'; // red - uneven
+            }
+
+            const accEl = document.getElementById('accuracy');
+            accEl.textContent = accuracy.toFixed(0) + '%';
+            if (accuracy >= 90) {
+                accEl.style.color = '#22c55e'; // green
+            } else if (accuracy >= 70) {
+                accEl.style.color = '#fbbf24'; // yellow
+            } else {
+                accEl.style.color = '#ef4444'; // red
+            }
         }
 
         function updateCharts(notes) {
