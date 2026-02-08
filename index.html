@@ -1378,7 +1378,8 @@
                             callbacks: {
                                 label: (context) => {
                                     const note = notes[context.dataIndex];
-                                    let label = `Vel: ${note.velocity}`;
+                                    const direction = note.direction ? (note.direction.charAt(0).toUpperCase() + note.direction.slice(1)) : 'Static';
+                                    let label = `Note: ${note.name} (${direction}) | Vel: ${note.velocity}`;
                                     if (note.fingering) label += ` | Finger: ${note.fingering}`;
                                     if (note.isCrossing) label += ` (Crossing)`;
                                     return label;
@@ -1410,7 +1411,19 @@
                         x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
                     },
                     plugins: {
-                        legend: { labels: { color: '#f8fafc' } }
+                        legend: { labels: { color: '#f8fafc' } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const note = notes[context.dataIndex];
+                                    const direction = note.direction ? (note.direction.charAt(0).toUpperCase() + note.direction.slice(1)) : 'Static';
+                                    let label = `Note: ${note.name} (${direction}) | Offset: ${note.offsetMs.toFixed(1)}ms`;
+                                    if (note.fingering) label += ` | Finger: ${note.fingering}`;
+                                    if (note.isCrossing) label += ` (Crossing)`;
+                                    return label;
+                                }
+                            }
+                        }
                     }
                 }
             });
