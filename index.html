@@ -70,8 +70,10 @@
             cursor: pointer;
         }
 
-        .upload-section:hover {
+        .upload-section:hover,
+        .upload-section.drag-over {
             border-color: var(--accent);
+            background-color: rgba(56, 189, 248, 0.05);
         }
 
         #file-input {
@@ -927,8 +929,7 @@
             if (currentMidi) analyzeMidi(currentMidi);
         }
 
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+        async function processFile(file) {
             if (!file) return;
 
             loading.style.display = 'flex';
@@ -944,7 +945,46 @@
             } finally {
                 loading.style.display = 'none';
             }
+        }
+
+        fileInput.addEventListener('change', async (e) => {
+            await processFile(e.target.files[0]);
         });
+
+        const uploadSection = document.querySelector('.upload-section');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadSection.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadSection.addEventListener(eventName, () => {
+                uploadSection.classList.add('drag-over');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadSection.addEventListener(eventName, () => {
+                uploadSection.classList.remove('drag-over');
+            }, false);
+        });
+
+        uploadSection.addEventListener('drop', async (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            await processFile(file);
+        });
+
+        // Prevent default drag and drop behavior on the whole window
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        }, false);
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+        }, false);
 
         function analyzeMidi(midi) {
             const notes = [];
