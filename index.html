@@ -1186,7 +1186,8 @@
             // Finger-Note Aggregation
             const aggregates = aggregateAnalysis(notes);
             const fingerLabels = aggregates.map(a => `F${a.finger} - ${a.note}`);
-            const fingerOffsets = aggregates.map(a => a.avgOffset);
+            const fingerPosOffsets = aggregates.map(a => a.avgPosOffset);
+            const fingerNegOffsets = aggregates.map(a => a.avgNegOffset);
             const fingerVels = aggregates.map(a => a.avgVelocity);
 
             const ctxFinger = document.getElementById('fingerNoteChart').getContext('2d');
@@ -1196,8 +1197,16 @@
                     labels: fingerLabels,
                     datasets: [
                         {
-                            label: 'Avg Abs Offset (ms)',
-                            data: fingerOffsets,
+                            label: 'Avg Late (ms)',
+                            data: fingerPosOffsets,
+                            backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                            borderColor: '#22c55e',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Avg Early (ms)',
+                            data: fingerNegOffsets,
                             backgroundColor: 'rgba(56, 189, 248, 0.7)',
                             borderColor: '#38bdf8',
                             borderWidth: 1,
@@ -1250,19 +1259,28 @@
                 if (!n.fingering) return;
                 const key = `${n.fingering}-${n.pitchName}`;
                 if (!groups[key]) {
-                    groups[key] = { finger: n.fingering, note: n.pitchName, offsets: [], velocities: [] };
+                    groups[key] = { finger: n.fingering, note: n.pitchName, posOffsets: [], negOffsets: [], velocities: [] };
                 }
-                groups[key].offsets.push(Math.abs(n.offsetMs));
+                if (n.offsetMs >= 0) {
+                    groups[key].posOffsets.push(n.offsetMs);
+                } else {
+                    groups[key].negOffsets.push(n.offsetMs);
+                }
                 groups[key].velocities.push(n.velocity);
             });
 
-            return Object.values(groups).map(g => ({
-                finger: g.finger,
-                note: g.note,
-                avgOffset: g.offsets.reduce((a, b) => a + b, 0) / g.offsets.length,
-                avgVelocity: g.velocities.reduce((a, b) => a + b, 0) / g.velocities.length,
-                count: g.offsets.length
-            })).sort((a, b) => a.finger - b.finger || a.note.localeCompare(b.note));
+            return Object.values(groups).map(g => {
+                const posCount = g.posOffsets.length;
+                const negCount = g.negOffsets.length;
+                return {
+                    finger: g.finger,
+                    note: g.note,
+                    avgPosOffset: posCount > 0 ? g.posOffsets.reduce((a, b) => a + b, 0) / posCount : 0,
+                    avgNegOffset: negCount > 0 ? g.negOffsets.reduce((a, b) => a + b, 0) / negCount : 0,
+                    avgVelocity: g.velocities.reduce((a, b) => a + b, 0) / g.velocities.length,
+                    count: posCount + negCount
+                };
+            }).sort((a, b) => a.finger - b.finger || a.note.localeCompare(b.note));
         }
 
         function updateAggregateTable(aggregates) {
@@ -1273,7 +1291,7 @@
                         <tr>
                             <th>Finger</th>
                             <th>Note</th>
-                            <th>Avg Offset (ms)</th>
+                            <th>Avg Early/Late (ms)</th>
                             <th>Avg Velocity</th>
                             <th>Sample Count</th>
                         </tr>
@@ -1282,12 +1300,16 @@
             `;
 
             aggregates.forEach(a => {
-                const offsetColor = a.avgOffset > 25 ? '#f87171' : (a.avgOffset < 15 ? '#4ade80' : 'inherit');
+                const posColor = a.avgPosOffset > 25 ? '#f87171' : (a.avgPosOffset < 15 ? '#4ade80' : 'inherit');
+                const negColor = a.avgNegOffset < -25 ? '#f87171' : (a.avgNegOffset > -15 ? '#4ade80' : 'inherit');
                 html += `
                     <tr>
                         <td>Finger ${a.finger}</td>
                         <td>${a.note}</td>
-                        <td style="color: ${offsetColor}; font-weight: bold;">${a.avgOffset.toFixed(1)}</td>
+                        <td style="font-weight: bold;">
+                            <span style="color: ${negColor}">${a.avgNegOffset.toFixed(1)}</span> / 
+                            <span style="color: ${posColor}">+${a.avgPosOffset.toFixed(1)}</span>
+                        </td>
                         <td>${a.avgVelocity.toFixed(1)}</td>
                         <td>${a.count}</td>
                     </tr>
