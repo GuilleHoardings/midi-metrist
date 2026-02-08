@@ -1,6 +1,9 @@
-# MIDI Piano Technical Exercise Analyzer
+# MIDI Metrist
 
-A specialized tool for analyzing rhythmic and dynamic evenness in piano scales and technical studies. It is specifically designed to evaluate MIDI recordings of single-note patterns (such as quarter-note scales) played against a steady beat.
+![Application Screenshot](screenshot.png)
+
+
+A specialized tool for analyzing rhythmic and dynamic evenness in piano scales. It is specifically designed to evaluate MIDI recordings of single-note patterns (such as quarter-note scales) played against a steady beat.
 
 Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency of technical execution, helping pianists identify finger-specific weaknesses and directional biases.
 
@@ -32,7 +35,7 @@ Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency
 
 1. **Record your MIDI**: Record a technical exercise (like a C Major scale) against a steady metronome. The tool is optimized for **quarter-note** recordings.
 2. **Select Hand**: Toggle between **Left Hand (LH)** and **Right Hand (RH)** in the tool.
-3. **Upload**: Drag and drop your `.mid` file into the analyzer.
+3. **Upload**: Drag and drop your `.mid` file into the analyzer. You can use the included `example.mid` to test the functionality immediately!
 4. **Analyze**: Explore the dashboard, charts, and tables to identify technical areas for improvement.
 
 ## 🛠️ Technical Stack
@@ -46,8 +49,9 @@ Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency
 
 This is a portable, single-file web application. No installation is required.
 
-1. Clone the repository.
+1. Clone the repository or simple download the `index.html` file.
 2. Open `index.html` in any modern web browser.
+3. Use the included `example.mid` to see an example analysis.
 
 ---
 *Created for musicians looking to perfect their technical precision through data-driven practice.*
