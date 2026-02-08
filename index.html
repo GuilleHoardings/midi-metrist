@@ -1185,7 +1185,7 @@
 
             // Finger-Note Aggregation
             const aggregates = aggregateAnalysis(notes);
-            const fingerLabels = aggregates.map(a => `F${a.finger} - ${a.note}`);
+            const fingerLabels = aggregates.map(a => `${a.note} (F${a.finger})`);
             const fingerPosOffsets = aggregates.map(a => a.avgPosOffset);
             const fingerNegOffsets = aggregates.map(a => a.avgNegOffset);
             const fingerVels = aggregates.map(a => a.avgVelocity);
@@ -1257,9 +1257,9 @@
             const groups = {};
             notes.forEach(n => {
                 if (!n.fingering) return;
-                const key = `${n.fingering}-${n.pitchName}`;
+                const key = `${n.fingering}-${n.name}`;
                 if (!groups[key]) {
-                    groups[key] = { finger: n.fingering, note: n.pitchName, posOffsets: [], negOffsets: [], velocities: [] };
+                    groups[key] = { finger: n.fingering, note: n.name, midi: n.midi, posOffsets: [], negOffsets: [], velocities: [] };
                 }
                 if (n.offsetMs >= 0) {
                     groups[key].posOffsets.push(n.offsetMs);
@@ -1275,12 +1275,13 @@
                 return {
                     finger: g.finger,
                     note: g.note,
+                    midi: g.midi,
                     avgPosOffset: posCount > 0 ? g.posOffsets.reduce((a, b) => a + b, 0) / posCount : 0,
                     avgNegOffset: negCount > 0 ? g.negOffsets.reduce((a, b) => a + b, 0) / negCount : 0,
                     avgVelocity: g.velocities.reduce((a, b) => a + b, 0) / g.velocities.length,
                     count: posCount + negCount
                 };
-            }).sort((a, b) => a.finger - b.finger || a.note.localeCompare(b.note));
+            }).sort((a, b) => a.midi - b.midi || a.finger - b.finger);
         }
 
         function updateAggregateTable(aggregates) {
