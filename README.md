@@ -1,11 +1,10 @@
 # MIDI Metrist
 
-![Application Screenshot](screenshot.png)
-
-
 A specialized tool for analyzing rhythmic and dynamic evenness in piano scales. It is specifically designed to evaluate MIDI recordings of single-note patterns (such as quarter-note scales) played against a steady beat.
 
 Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency of technical execution, helping pianists identify finger-specific weaknesses and directional biases.
+
+![Application Screenshot](screenshot.png)
 
 ## 🎹 Key Features
 
