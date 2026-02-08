@@ -4,6 +4,10 @@ A specialized tool for analyzing rhythmic and dynamic evenness in piano scales. 
 
 Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency of technical execution, helping pianists identify finger-specific weaknesses and directional biases.
 
+You can use the tool directly in your browser without any installation:
+**[https://guillehoardings.github.io/midi-metrist/](https://guillehoardings.github.io/midi-metrist/)**
+
+
 ![Application Screenshot](screenshot.png)
 
 ## 🎹 Key Features
@@ -24,21 +28,6 @@ Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency
 - **Pitch-Specific Data**: Distinguishes between octaves (e.g., C4 vs C5) to isolate range-specific technical weaknesses.
 - **Directional Split**: Separate charts for ascending and descending movements to catch directional bias.
 - **Micro-Timing**: Detailed breakdown of Avg Late (+) and Avg Early (-) offsets.
-
-## 🚀 Deployment
-
-To host this tool on **GitHub Pages**:
-
-1. Create a new repository on GitHub.
-2. Push this folder to your repository:
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
-3. Go to your repository **Settings** -> **Pages**.
-4. Select **Build and deployment** -> **Branch: main** -> **/ (root)**.
-5. Click **Save**. Your tool will be live at `https://yourusername.github.io/your-repo-name/`.
 
 ## 🛠️ Technical Stack
 
