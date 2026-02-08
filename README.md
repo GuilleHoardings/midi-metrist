@@ -9,10 +9,11 @@ Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency
 ## 🎹 Key Features
 
 ### 1. Performance Dashboard
-- **Average Velocity & Jitter**: Monitor your dynamic control and range.
-- **Timing Accuracy**: View average millisecond offset from the rhythmic grid.
-- **Consistency Score**: Statistical standard deviation of your timing.
-- **Deviation Tracking**: Automatic flagging of notes with significant timing or velocity errors.
+- **Notes Count**: Total notes analyzed.
+- **Avg Offset**: Average absolute timing error in milliseconds.
+- **Late/Early %**: Percentage of notes played significantly behind or ahead of the beat (>30ms).
+- **Velocity Spread**: Range between loudest and softest notes (lower = more even touch).
+- **Professional Accuracy**: Overall consistency score based on timing and dynamic precision.
 
 ### 2. Interactive Piano Visualization
 - **Scale Mapping**: Visualizes your performance on a virtual 88-key piano.
@@ -22,35 +23,29 @@ Unlike general MIDI timing tools, this analyzer focuses on the micro-consistency
 ### 3. Finger-Note Distribution Analysis
 - **Pitch-Specific Data**: Distinguishes between octaves (e.g., C4 vs C5) to isolate range-specific technical weaknesses.
 - **Directional Split**: Separate charts for ascending and descending movements to catch directional bias.
-- **Early/Late Bias**: Instead of simple averages, it shows **Average Late (+)** and **Average Early (-)** offsets separately for every finger-note combination.
-- **Velocity Tracking**: Overlay line chart showing average velocity per finger.
+- **Micro-Timing**: Detailed breakdown of Avg Late (+) and Avg Early (-) offsets.
 
-### 4. Technical Insights
-- **Heuristic Fingering**: Intelligent algorithm that maps your performance to standard scale fingerings (Right Hand/Left Hand configurable).
-- **Rhythmic Feedback**: Detailed insight into whether you tend to play ahead or behind the beat.
-- **Dynamic Heatmap**: Highlights dynamic consistency across different fingers.
+## 🚀 Deployment
 
-## 🚀 How to Use
+To host this tool on **GitHub Pages**:
 
-1. **Record your MIDI**: Record a technical exercise (like a C Major scale) against a steady metronome. The tool is optimized for **quarter-note** recordings.
-2. **Select Hand**: Toggle between **Left Hand (LH)** and **Right Hand (RH)** in the tool.
-3. **Upload**: Drag and drop your `.mid` file into the analyzer. You can use the included `example.mid` to test the functionality immediately!
-4. **Analyze**: Explore the dashboard, charts, and tables to identify technical areas for improvement.
+1. Create a new repository on GitHub.
+2. Push this folder to your repository:
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
+3. Go to your repository **Settings** -> **Pages**.
+4. Select **Build and deployment** -> **Branch: main** -> **/ (root)**.
+5. Click **Save**. Your tool will be live at `https://yourusername.github.io/your-repo-name/`.
 
 ## 🛠️ Technical Stack
 
 - **Core**: Vanilla JavaScript (HTML5/CSS3)
 - **MIDI Parsing**: [@tonejs/midi](https://github.com/Tonejs/Midi)
 - **Visualization**: [Chart.js](https://www.chartjs.org/)
-- **Styling**: Modern CSS with Glassmorphism and CSS Grid/Flexbox
-
-## 📥 Installation
-
-This is a portable, single-file web application. No installation is required.
-
-1. Clone the repository or simple download the `index.html` file.
-2. Open `index.html` in any modern web browser.
-3. Use the included `example.mid` to see an example analysis.
+- **Styling**: Premium CSS with Glassmorphism and CSS Grid/Flexbox
 
 ---
 *Created for musicians looking to perfect their technical precision through data-driven practice.*
