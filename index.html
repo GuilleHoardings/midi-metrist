@@ -220,9 +220,15 @@
 
         .charts-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 1.5rem;
             margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 768px) {
@@ -991,6 +997,9 @@
                 <div class="chart-container">
                     <canvas id="offsetChart"></canvas>
                 </div>
+                <div class="chart-container">
+                    <canvas id="intervalChart"></canvas>
+                </div>
             </div>
 
             <div class="insight-section">
@@ -1035,6 +1044,7 @@
 
         let velocityChart = null;
         let offsetChart = null;
+        let intervalChart = null;
         let fingerNoteChartAsc = null;
         let fingerNoteChartDesc = null;
         let currentMidi = null;
@@ -1353,8 +1363,15 @@
                 return window.reduce((sum, val) => sum + val, 0) / window.length;
             });
 
+            // Calculate time differences to previous note
+            const timeDiffs = notes.map((note, i) => {
+                if (i === 0) return null; // First note has no previous
+                return (note.time - notes[i-1].time) * 1000; // Convert to ms
+            });
+
             if (velocityChart) velocityChart.destroy();
             if (offsetChart) offsetChart.destroy();
+            if (intervalChart) intervalChart.destroy();
             if (fingerNoteChartAsc) fingerNoteChartAsc.destroy();
             if (fingerNoteChartDesc) fingerNoteChartDesc.destroy();
 
@@ -1444,6 +1461,52 @@
                                     } else {
                                         return `Rolling Average: ${context.parsed.y.toFixed(1)}ms`;
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const ctxInt = document.getElementById('intervalChart').getContext('2d');
+            intervalChart = new Chart(ctxInt, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Time to Previous Note (ms)',
+                        data: timeDiffs,
+                        backgroundColor: 'rgba(168, 85, 247, 0.6)',
+                        borderColor: '#a855f7',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            grid: { color: '#334155' }, 
+                            ticks: { color: '#94a3b8' },
+                            beginAtZero: true
+                        },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc' } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    if (context.parsed.y === null) {
+                                        return 'First note - no previous';
+                                    }
+                                    const note = notes[context.dataIndex];
+                                    const prevNote = notes[context.dataIndex - 1];
+                                    let label = `Interval: ${context.parsed.y.toFixed(1)}ms`;
+                                    if (prevNote) {
+                                        label += ` | From ${prevNote.name} to ${note.name}`;
+                                    }
+                                    return label;
                                 }
                             }
                         }
