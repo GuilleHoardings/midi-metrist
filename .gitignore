@@ -5,6 +5,9 @@ Thumbs.db
 # MIDI files (if you want to keep your repo clean of recordings)
 *.mid
 *.midi
+*.wav
+*.reapeaks
+*.mp3
 
 # Example/Test files to keep
 !example.mid
