@@ -1425,8 +1425,8 @@
                     datasets: [{
                         label: 'Offset from Grid (ms)',
                         data: offsets,
-                        backgroundColor: notes.map(n => n.isDeviation ? 'rgba(239, 68, 68, 0.8)' : (n.offsetMs >= 0 ? 'rgba(34, 197, 94, 0.6)' : 'rgba(56, 189, 248, 0.6)')),
-                        borderColor: notes.map(n => n.isDeviation ? '#ef4444' : (n.offsetMs >= 0 ? '#22c55e' : '#38bdf8')),
+                        backgroundColor: notes.map(n => n.isDeviation ? 'rgba(239, 68, 68, 0.8)' : (n.direction === 'ascending' ? 'rgba(34, 197, 94, 0.6)' : 'rgba(56, 189, 248, 0.6)')),
+                        borderColor: notes.map(n => n.isDeviation ? '#ef4444' : (n.direction === 'ascending' ? '#22c55e' : '#38bdf8')),
                         borderWidth: 1
                     }, {
                         label: 'Rolling Average (7 notes)',
